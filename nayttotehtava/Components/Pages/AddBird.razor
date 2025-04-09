@@ -1,0 +1,99 @@
+﻿@page "/addbird"
+@rendermode InteractiveServer
+@inject ImageService ImageService
+@using nayttotehtava.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Havainto</PageTitle>
+
+<h1>Lisää havainto</h1>
+
+<div class="row">
+    <div class="form d-flex">
+        <div class="col-12">
+        
+            <div class="form-group my-2">
+                <label for="species">Laji:</label>
+                <InputText class="form-control" id="species" @bind-Value="species" />
+            </div>
+
+            <div class="form-group my-2">
+                <label for="date">Havaintopäivä:</label>
+                <InputText class="form-control" id="date" @bind-Value="date" />
+            </div>
+
+            <div class="form-group my-2">
+                <label for="location">Havaintopaikka:</label>
+                <InputText class="form-control" id="location" @bind-Value="location" />
+            </div>
+            <p>@status</p>
+            <div class="form-group">
+                <label for="pic" class="d-block">Kuva:</label>
+                <InputFile class="" id="pic" OnChange="HandleFileSelected" accept="image/*" />
+            </div>
+
+            <button class="btn btn-primary mt-4 mx-2" @onclick="SaveImage">Tallenna</button>
+            <button class="btn btn-primary mt-4 mx-2" @onclick="ClearAll">Tyhjennä</button>
+        </div>
+    
+       
+            
+        
+    
+    </div>
+</div>
+
+
+
+
+
+@code {
+
+    IBrowserFile? selectedFile;
+    string status = "";
+
+    string species = "";
+    string date = "";
+    string location = "";
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        status = $"Valittu tiedosto: {selectedFile?.Name}";
+
+    }
+
+    private async Task SaveImage()
+    {
+        if (selectedFile == null)
+        {
+            status = "Valitse kuva ennen tallenusta";
+            return;
+        }
+
+        try
+        {
+            await using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            await ImageService.SaveImageWithInfoAsync(selectedFile.Name, stream, species, date, location);
+            status = $"Uusi havainto lisätty";
+
+
+            species = date = location = "";
+            selectedFile = null;
+
+            // Päivitä kuvat näkyviin
+            ImageService.GetImagesWithInfo();
+        }
+        catch (Exception ex)
+        {
+            status = $"Virhe havaintoa lisätessä: {ex.Message}";
+        }
+    }
+
+    private void ClearAll()
+    {
+        species = date = location = "";
+        selectedFile = null;
+        status = "";
+    }
+}

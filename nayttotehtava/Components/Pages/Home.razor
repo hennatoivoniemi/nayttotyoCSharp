@@ -1,0 +1,124 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject ImageService ImageService
+@using nayttotehtava.Models
+
+<PageTitle>Home</PageTitle>
+
+<h1 class="row justify-content-center">Lintubongarin sovellus</h1>
+
+<div class="row">
+
+	@if (selectedImage !=null)
+	{
+		<div class="col-8">
+			<img src="@selectedImage.ImageUrl" class="img-fluid img-thumbnail" />
+		</div>
+		<div class="col-4">
+			<h5>@selectedImage.Species</h5>
+			<p>Havaintopäivä: @selectedImage.Date</p>
+			<p>Havaintopaikka: @selectedImage.Location</p>
+		</div>
+	} else
+	{
+		<p>Ei havaintoja</p>
+	}
+</div>
+
+<div class="row my-2">
+	@if (images.Count >= 1)
+	{
+
+		@foreach (var img in images)
+		{
+			<img class="col-2 img-thumbnail @(img == selectedImage ? "selected" : "") " src="@img.ImageUrl" @onclick="@(() => SelectImage(img))"/>
+		}
+
+	}
+	
+</div>
+
+@code {
+	List<ImageWithInfo> images = new();
+	ImageWithInfo? selectedImage;
+
+	protected override void OnInitialized()
+	{
+		images = ImageService.GetImagesWithInfo();
+		if (images.Any())
+		{
+			selectedImage = images[0];
+		}
+	}
+
+	void SelectImage(ImageWithInfo img)
+	{
+		selectedImage = img;
+	}
+}
+
+
+@* @code { *@
+@* 	// lista johon tallennetaan kaikki images-kansion kuvat käyttämällä GetAllImages-funktiota (Components-kansiossa) *@
+@* 	List<ImageWithInfo> images = new(); *@
+
+@* 	protected override void OnInitialized() *@
+@* 	{ *@
+@* 		images = ImageService.GetAllImages(); *@
+@* 	} *@
+
+@* 	public string? LintuKuva { get; set; } *@
+
+@* 	// funktio joka ajetaan, kun klikataan kuvan thumbnailia *@
+@* 	public void PikkuKuvanKlikkaus(string lintukuva) *@
+@* 	{ *@
+@* 		Console.WriteLine("klikkasit pikkukuvaa"); *@
+@* 		Console.WriteLine(lintukuva); *@
+@* 		LintuKuva = lintukuva; *@
+@* 	} *@
+@* } *@
+
+@* @code {
+	public string? LintuKuva { get; set; }
+
+	public void PikkuKuvanKlikkaus(string lintukuva)
+	{
+		Console.WriteLine("klikkasit pikkukuvaa");
+		LintuKuva = $"Pictures/{lintukuva}.jpg";
+	}
+} *@
+
+@* <div class="row">
+	<div class="col-8">
+		@if (LintuKuva is not null)
+		{
+			<img src="@LintuKuva" />
+		} else
+		{
+			<img src="images/tilhi.jpg" />
+		}
+
+	</div>
+	<div class="col-4">
+		<p>tähän tulee linnun tiedot</p>
+		<input id="File1" type="file" />
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-2" @onclick=@(() => PikkuKuvanKlikkaus("tilhi"))>
+		<img class="img-fluid" src="images/tilhi.jpg" />
+	</div>
+	<div class="col-2" @onclick=@(() => PikkuKuvanKlikkaus("punarinta"))>
+		<img class="img-fluid" src="images/punarinta.jpg" />
+	</div>
+	<div class="col-2" @onclick=@(() => PikkuKuvanKlikkaus("kyhmyjoutsen"))>
+		<img class="img-fluid" src="images/kyhmyjoutsen.jpg" />
+	</div>
+	<div class="col-2" @onclick=@(() => PikkuKuvanKlikkaus("sinisorsa"))>
+		<img class="img-fluid" src="images/sinisorsa.jpg" />
+	</div>
+</div> *@
+
+
+@* struct on vähän ku objekti *@
