@@ -1,64 +1,99 @@
 ﻿@page "/game"
-@attribute [StreamRendering]
+@rendermode InteractiveServer
+@* @attribute [StreamRendering] *@
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Peli</PageTitle>
 
-<h1>Weather</h1>
+<h1>Tietovisa</h1>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
+@* Peli pyörii kunnes peli päättyy tai vastaa kaikkiin oikein*@
+@if (!gameOver)
 {
-    <p><em>Loading...</em></p>
-}
-else
+    <h4>Tunnista kuvan lintu:</h4>
+    <div class="row">
+        <img class=" col-6" src="@currentQuestion.pic" alt="bird" />
+        <h4 class="col-6">Pisteet: @points</h4>
+    </div>
+    <div class="row my-2">
+        <EditForm Model="answerModel" OnValidSubmit="CheckAnswer">
+            <InputRadioGroup @bind-Value="answerModel.selectedAnswer">
+                @for (int i = 0; i < currentQuestion.options.Length; i++)
+                {
+                    var option = currentQuestion.options[i];
+                    <div class="p-2">
+                        <InputRadio Value="@option"/>
+                        <label>@option</label>
+                    </div>
+                }
+            </InputRadioGroup>
+            <button type="submit" class="btn btn-primary">Vastaa</button>
+        </EditForm>
+    </div>
+} else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h4>@gameMessage</h4>
+    <button type="button" class="btn btn-primary" @onclick="RestartGame">Aloita alusta</button>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
 
-    protected override async Task OnInitializedAsync()
+    //Luodaan sisäinen luokka
+    private class AnswerModel
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
+        public string? selectedAnswer { get; set; }
+    }
+    private AnswerModel answerModel = new();
 
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+    private record Question(string pic, string[] options, string correctAnswer);
+
+    // Pelin kysymykset tallennettuna tänne
+    private List<Question> questions = new()
+    {
+        new Question("/images/tunnistus/lintu1.jpg", new[] {"Selkälokki", "Kalalokki", "Naurulokki"}, "Naurulokki"),
+        new Question("/images/tunnistus/lintu2.jpg", new[] {"Sarvipöllö", "Huuhkaja", "Hiiripöllö"}, "Huuhkaja"),
+        new Question("/images/tunnistus/lintu3.jpg", new[] {"Kirjosieppo", "Pähkinänakkeli", "Kuusitiainen"}, "Pähkinänakkeli"),
+        new Question("/images/tunnistus/lintu4.jpg", new[] {"Lehtokurppa", "Kuovi", "Ruostekuiri"}, "Lehtokurppa"),
+        new Question("/images/tunnistus/lintu5.jpg", new[] {"Hiirihaukka", "Kanahaukka", "Varpushaukka"}, "Kanahaukka")
+    };
+
+    //Tarvitut muuttujat
+    private int currentIndex = 0;
+    private bool gameOver = false;
+    private string gameMessage = "";
+    private int points = 0;
+
+    private Question currentQuestion => questions[currentIndex];
+
+    //Tarkistetaan onko vastaus oikein
+    private void CheckAnswer()
+    {
+        if(answerModel.selectedAnswer == currentQuestion.correctAnswer)
         {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+            currentIndex++;
+            points++;
+            answerModel.selectedAnswer = null;
+
+            if (currentIndex >= questions.Count)
+            {
+                gameOver = true;
+                gameMessage = "Onneksi olkoon, voitit pelin!";
+            }
+        }
+        else
+        {
+            gameOver = true;
+            gameMessage = "Väärä vastaus, peli päättyi.";
+        }
     }
 
-    private class WeatherForecast
+    //Nollataan kaikki jos pelaaja haluaa aloittaa alusta
+    private void RestartGame()
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        currentIndex = 0;
+        answerModel.selectedAnswer = null;
+        gameOver = false;
+        gameMessage = "";
+        points = 0;
     }
+
 }

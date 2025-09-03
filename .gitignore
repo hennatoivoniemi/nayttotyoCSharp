@@ -1,0 +1,5 @@
+# ignore obj-, bin- ja .vs-kansiot
+obj/
+bin/
+.vs/
+.vscode/

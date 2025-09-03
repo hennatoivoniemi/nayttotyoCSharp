@@ -18,7 +18,7 @@ public class ImageService
     //Kuvien ja tietojen haku tiedostoista
     public List<ImageWithInfo> GetImagesWithInfo()
     {
-        string imagesPath = Path.Combine(_env.WebRootPath, "images");
+        string imagesPath = Path.Combine(_env.WebRootPath, "images/havainnot");
         string infoPath = Path.Combine(_env.WebRootPath, "info");
 
         if (!Directory.Exists(imagesPath)) Directory.CreateDirectory(imagesPath);
@@ -39,7 +39,7 @@ public class ImageService
 
             var imageInfo = new ImageWithInfo
             {
-                ImageUrl = "/images/" + imageName
+                ImageUrl = "/images/havainnot/" + imageName
             };
 
             if (File.Exists(txtPath))
@@ -65,7 +65,7 @@ public class ImageService
     //Kuvien ja tietojen lisäys
     public async Task SaveImageWithInfoAsync(string fileName, Stream fileStream, string species, string date, string location)
         {
-            string imagesPath = Path.Combine(_env.WebRootPath, "images");
+            string imagesPath = Path.Combine(_env.WebRootPath, "images/havainnot");
             string infoPath = Path.Combine(_env.WebRootPath, "info");
 
             if (!Directory.Exists(imagesPath))
