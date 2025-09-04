@@ -2,6 +2,7 @@
 
 
 ##Toiminta ja käyttötarkoitus
+
 Tämä on yksinkertainen lintuharrastajille suunnattu appi. Sivuille voi lisätä omia lintuhavaintoja, selailla niitä ja pelata yksinkertaista lintujentunnistuspeliä. Appi on toteutettu Blazor Web Appina käyttäen C#, HTML ja CSS-kieliä.
 - Kuvien tallennusmahdollisuus '/wwwroot/images/havainnot/' -kansioon
 - Tallennettujen havaintojen selailu, jossa tiedot noudetaan '/wwwroot/images/havainnot/' -kansiosta
